@@ -25,5 +25,4 @@ input,textarea{font:inherit;width:100%;padding:10px;border:1px solid var(--line)
 .tab button{flex:1;border:0;background:none;border-radius:10px}.tab .on{background:var(--ink);color:var(--cream)}
 .xcard{background:var(--ink);color:var(--cream);border-radius:16px;padding:16px;margin:8px 0}
 .xcard .row{border-top:1px solid #3A3758;padding:7px 0}
-.logo{width:30px;height:30px;border-radius:9px;background:var(--tan);display:inline-block;vertical-align:middle;margin-right:8px}
 .lb{display:block;border:1px solid var(--ink);border-radius:12px;padding:10px 14px;font-weight:600;cursor:pointer;background:#fff}.lb.p{background:var(--tan);border-color:var(--tan)}
