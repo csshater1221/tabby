@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app'
 import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-check'
-import { getAuth } from 'firebase/auth'
+import { browserLocalPersistence, getAuth, indexedDBLocalPersistence, initializeAuth } from 'firebase/auth'
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore'
 
 const env = import.meta.env
@@ -21,13 +21,25 @@ if (env.VITE_RECAPTCHA_SITE_KEY) {
   })
 }
 
-export const auth = getAuth(app)
+// getAuth() bundles the popup/redirect resolver, which makes startup wait on a hidden iframe from the auth domain.
+// Initializing without it keeps startup local; the resolver is passed to signInWithPopup only when signing in.
+function createAuth() {
+  try {
+    return initializeAuth(app, { persistence: [indexedDBLocalPersistence, browserLocalPersistence] })
+  } catch {
+    return getAuth(app) // already initialized (dev hot reload)
+  }
+}
+export const auth = createAuth()
 
 // Offline support: data is cached in IndexedDB and shared across tabs.
 // Writes made offline are queued and sync automatically when the connection returns.
 export const db = initializeFirestore(app, {
   localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
 })
+
+// Set VITE_GEMINI_MODEL in .env to change the receipt-scanning model without touching code.
+const DEFAULT_GEMINI_MODEL = 'gemini-3.5-flash-lite'
 
 const RECEIPT_PROMPT =
   'Read this receipt. Return JSON only: {"items":[{"name":string,"cents":integer line total}],' +
@@ -40,7 +52,7 @@ async function getReceiptModel() {
     const { getAI, getGenerativeModel, GoogleAIBackend } = await import('firebase/ai')
     const ai = getAI(app, { backend: new GoogleAIBackend(), useLimitedUseAppCheckTokens: true })
     receiptModel = getGenerativeModel(ai, {
-      model: 'gemini-3.8-flash',
+      model: env.VITE_GEMINI_MODEL || DEFAULT_GEMINI_MODEL,
       generationConfig: { responseMimeType: 'application/json' }
     })
   }

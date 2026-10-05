@@ -9,6 +9,7 @@ import FriendsScreen from './components/FriendsScreen'
 import HangoutScreen from './components/HangoutScreen'
 import HomeScreen from './components/HomeScreen'
 import LoginScreen from './components/LoginScreen'
+import Splash from './components/Splash'
 
 export default function App() {
   const [user, setUser] = useState(undefined) // undefined = still checking, null = signed out
@@ -22,7 +23,7 @@ export default function App() {
 
   useEffect(() => onAuthStateChanged(auth, setUser), [])
 
-  if (user === undefined) return null
+  if (user === undefined) return <Splash />
   if (!user) return <LoginScreen />
 
   const userDoc = (collectionName, documentId) => doc(db, 'users', user.uid, collectionName, documentId)
