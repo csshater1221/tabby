@@ -11,6 +11,11 @@ export default function ReceiptScanner({ people, receipt, onReceiptChange, onErr
 
   async function scanFile(imageFile) {
     if (!imageFile) return
+    if (!navigator.onLine) {
+      onError('Receipt scanning needs an internet connection. You can still add the items yourself.')
+      onReceiptChange(EMPTY_RECEIPT)
+      return
+    }
     setIsScanning(true)
     onError('')
     try {

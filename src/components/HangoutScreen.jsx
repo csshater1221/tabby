@@ -1,8 +1,9 @@
-import { useRef, useState } from 'react'
+import { lazy, Suspense, useRef, useState } from 'react'
 import { amountsOwed, formatMoney, sumOf } from '../lib/split'
 import { shareAsImage } from '../lib/shareImage'
-import AddExpenseSheet from './AddExpenseSheet'
 import ShareCard from './ShareCard'
+
+const AddExpenseSheet = lazy(() => import('./AddExpenseSheet'))
 
 export default function HangoutScreen({ hangout, user, saveHangout, goBack, deleteHangout }) {
   const [isAddingExpense, setIsAddingExpense] = useState(false)
@@ -77,7 +78,7 @@ export default function HangoutScreen({ hangout, user, saveHangout, goBack, dele
         </>
       )}
 
-      {isAddingExpense && <AddExpenseSheet hangout={hangout} onClose={() => setIsAddingExpense(false)} onSave={addExpense} />}
+      {isAddingExpense && <Suspense fallback={null}><AddExpenseSheet hangout={hangout} onClose={() => setIsAddingExpense(false)} onSave={addExpense} /></Suspense>}
     </>
   )
 }

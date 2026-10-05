@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "prod": "expense-tracker-tabby"
+  },
+  "targets": {},
+  "etags": {}
+}

@@ -56,3 +56,14 @@ export function outstandingCents(hangout) {
   const owed = amountsOwed(hangout)
   return sumOf(Object.entries(owed).filter(([personId]) => !hangout.paid[personId]).map(([, cents]) => cents))
 }
+
+// One row per hangout where this friend owes something.
+export function friendStatement(hangouts, friendId) {
+  return hangouts.flatMap(hangout => {
+    const cents = amountsOwed(hangout)[friendId]
+    return cents ? [{ hangoutId: hangout.id, name: hangout.name, date: hangout.date, cents, isPaid: !!hangout.paid[friendId] }] : []
+  })
+}
+
+export const friendOutstandingCents = (hangouts, friendId) =>
+  sumOf(friendStatement(hangouts, friendId).filter(row => !row.isPaid).map(row => row.cents))

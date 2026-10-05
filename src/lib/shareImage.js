@@ -1,7 +1,6 @@
-import { toPng } from 'html-to-image'
-
 // Phones: opens the share sheet (Discord shows up there). Desktop: copies the image, or downloads it.
 export async function shareAsImage(element, fileName) {
+  const { toPng } = await import('html-to-image')
   const dataUrl = await toPng(element, { pixelRatio: 2 })
   const blob = await (await fetch(dataUrl)).blob()
   const file = new File([blob], fileName + '.png', { type: 'image/png' })

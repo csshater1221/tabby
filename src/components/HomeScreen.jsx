@@ -2,20 +2,22 @@ import { useState } from 'react'
 import { signOut } from 'firebase/auth'
 import { auth } from '../firebase'
 import { formatMoney, outstandingCents, sumOf } from '../lib/split'
+import FriendPicker from './FriendPicker'
 import Logo from './Logo'
 
-export default function HomeScreen({ hangouts, saveHangout, openHangout }) {
+export default function HomeScreen({ hangouts, friends, saveHangout, saveFriend, openHangout }) {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [hangoutName, setHangoutName] = useState('')
-  const [peopleText, setPeopleText] = useState('')
+  const [selectedFriendIds, setSelectedFriendIds] = useState([])
   const totalOwed = sumOf(hangouts.map(outstandingCents))
 
+  const toggleFriend = friendId =>
+    setSelectedFriendIds(current => (current.includes(friendId) ? current.filter(id => id !== friendId) : [...current, friendId]))
+
   function createHangout() {
-    const people = peopleText
-      .split(',')
-      .map(name => name.trim())
-      .filter(Boolean)
-      .map(name => ({ id: crypto.randomUUID(), name }))
+    const people = friends
+      .filter(friend => selectedFriendIds.includes(friend.id))
+      .map(friend => ({ id: friend.id, name: friend.name }))
     if (!hangoutName.trim() || !people.length) return
 
     const hangout = {
@@ -46,7 +48,8 @@ export default function HomeScreen({ hangouts, saveHangout, openHangout }) {
       {isFormOpen && (
         <div className="card gap">
           <input placeholder="Karaoke night" value={hangoutName} onChange={event => setHangoutName(event.target.value)} />
-          <textarea rows={2} placeholder="Who came? Alex, Kai, Sam" value={peopleText} onChange={event => setPeopleText(event.target.value)} />
+          <b>Who came?</b>
+          <FriendPicker friends={friends} selectedIds={selectedFriendIds} onToggle={toggleFriend} saveFriend={saveFriend} />
           <button className="p" onClick={createHangout}>Create hangout</button>
         </div>
       )}
